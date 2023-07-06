@@ -1,1 +1,1 @@
-redis.connect
+api.redis.connect
