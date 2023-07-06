@@ -1,0 +1,1399 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Redis Connect API",
+    "contact": {
+      "name": "Customer Support",
+      "url": "https://redis.com/company/support/"
+    },
+    "license": {
+      "name": "License Overview",
+      "url": "https://redis.com/legal/licenses/"
+    },
+    "version": "v0.10.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8282",
+      "description": "Inferred Url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "CLUSTER MANAGEMENT",
+      "description": " "
+    },
+    {
+      "name": "JOB MANAGEMENT",
+      "description": " "
+    },
+    {
+      "name": "LOG MANAGEMENT",
+      "description": " "
+    }
+  ],
+  "paths": {
+    "/connect/api/v1/cluster/database/flush": {
+      "delete": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "DELETE ALL Job Management Metadata",
+        "description": "All keys with a Redis Connect namespace will be deleted from the Job Management database.  It will not flush any other keys in case Job Management metadata is collocated with the target database. Example Key: {connect}:*",
+        "operationId": "databaseFlushUsingDELETE",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/jobAssignmentQueue/consumers/inactive": {
+      "delete": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "DELETE Inactive Job Assignment Queue Consumers",
+        "description": "When cluster members are instantiated they automatically subscribe to the Job Assignment Queue as consumers within a Redis Streams Consumer Group. Each cluster member uses their clusterMemberId as a unique consumer name for isolation purposes. Over the lifetime of the cluster, its likely that members will be removed, replaced, or fail which strands stale consumer names within the Consumer Group. For data hygiene, the administrator can use this operation to remove all inactive consumer names from the Job Assignment Queue Consumer Group. Example Key: {connect}:cluster:stream:jobClaimAssignmentsConsumerGroup",
+        "operationId": "cleanJobAssignmentConsumerGroupUsingDELETE",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/jobs/claim/{jobStatus}": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT",
+          "QUICK START"
+        ],
+        "summary": "GET Job Claims across Cluster",
+        "description": "Returns job claims from across the cluster that match the requested jobStatus. Example key: {connect}:job:jobName",
+        "operationId": "getJobClaimsByStatusUsingGET",
+        "parameters": [
+          {
+            "name": "jobStatus",
+            "in": "path",
+            "description": "Options: { staged | stopped | all }",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/leader": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET Redis Connect Cluster Leader",
+        "description": "Returns the clusterMemberId of the single cluster leader. Example Key: {connect}:cluster:leader:heartbeat",
+        "operationId": "getClusterLeaderUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/log/jobClaimTransitions": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET All Job Claim Transition Events",
+        "description": "Returns all job claim transition events (e.g. CLAIMED, MIGRATED, RELINQUISHED, RESTARTED, STAGED, STOPPED) across the cluster. Keep in mind the log only preserves the last 1000 events. Example key: {connect}:cluster:stream:jobClaimTransitions",
+        "operationId": "getAllJobClaimTransitionEventsUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/log/taskClaimTransitions": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET All Initial Load Task Claim Transition Events",
+        "description": "Returns all initial load task claim transition events (e.g. CLAIMED, COMPLETED, FAILED) across the cluster. Keep in mind the log only preserves the last 1000 events. Example key: {connect}:cluster:stream:taskClaimTransitions",
+        "operationId": "getAllTaskClaimTransitionEventsUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/member/capacity/{clusterMemberId}": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET Remaining Capacity to Claim Jobs on Cluster Member",
+        "description": "Returns the remaining capacity to claim UNASSIGNED jobs for the requested clusterMemberId (instanceId). Keep in mind that if another cluster member also has remaining capacity there is no way to guarantee this cluster member will be able to claim job ownership. Example key: 1234@cdc-server",
+        "operationId": "getClusterMemberRemainingCapacityUsingGET",
+        "parameters": [
+          {
+            "name": "clusterMemberId",
+            "in": "path",
+            "description": "Example: 1234@cdc-server",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/member/config/{clusterMemberId}": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET Cluster Member Configuration",
+        "description": "Returns the cluster member configuration for the requested clusterMemberId (instanceId). Example key: 1234@cdc-server",
+        "operationId": "getClusterMemberConfigUsingGET",
+        "parameters": [
+          {
+            "name": "clusterMemberId",
+            "in": "path",
+            "description": "Example: 1234@cdc-server",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/members/capacity": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET Remaining Capacity to Claim Jobs across Cluster",
+        "description": "Returns the remaining capacity to claim UNASSIGNED jobs across the cluster. Example key: {connect}:cluster:member:config:*",
+        "operationId": "getClusterRemainingCapacityUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/members/config": {
+      "get": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "GET Cluster Member Configurations across Cluster",
+        "description": "Returns ALL ACTIVE cluster member configurations across the cluster. There will be a delay before a successful response because it will first delete all cluster member configurations and wait until all active members rehydrate their configurations. Example key: {connect}:cluster:member:config:*",
+        "operationId": "getClusterMembersUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CLUSTER MANAGEMENT"
+        ],
+        "summary": "DELETE Cluster Member Configurations across Cluster",
+        "description": "Deletes all cluster member configurations. All active members will rehydrate their configurations based on the job.claim.attempt.interval. Since cluster member configurations expire based on a lease, it is useful to identify which cluster members are still active before making a decision on transitions such as migrations. Example key: {connect}:cluster:member:config:*",
+        "operationId": "deleteAllClusterMemberConfigsUsingDELETE",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/checkpoint/{jobId}": {
+      "get": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "GET Latest Job (Partition) Checkpoint",
+        "description": "Returns the latest job checkpoint for the provided jobId. Keep in mind, for partitioned jobs, jobId represents only a single job partition (since each manages its own offset). If checkpointTransactionsEnabled is true, only the checkpoint with the latest timestamp will be returned. Example key: connect:cp:jobName:partition:2:{*}",
+        "operationId": "getLatestUsingGET",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "description": "Example: {connect}:job:cdc-job:partition:2",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "SAVE Job (Partition) Checkpoint",
+        "description": "Saves the latest job checkpoint for the provided jobId. Keep in mind, for partitioned jobs, jobId represents only a single job partition since each manages its own offset. This should be performed with careful intent. For example, if an operation in the source transaction log is corrupted and its determined that the offset should be skipped, this method can be used to manually save the corrupted operation's offset as the latest checkpoint so the job can recover AFTER that position in the transaction log|table. Another purpose for this process, is to recover a job from an earlier offset, in which case the administrator could delete all existing checkpoints (per partition) and save a new one at the desired point in time (e.g. enable RPO). This job partition must be stopped. Example key: connect:cp:jobName:partition:1:{*}",
+        "operationId": "saveUsingPOST",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "description": "Example: {connect}:job:cdc-job:partition:2",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "exampleSetFlag": true,
+                "types": [
+                  "string"
+                ]
+              },
+              "exampleSetFlag": false
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/checkpoint/{jobName}": {
+      "delete": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "DELETE All Job Checkpoint(s)",
+        "description": "Deletes ALL checkpoints and secondary indexes (for distributed checkpoints) across all partitions for the provided jobName. If the target database is used for checkpoints, this WILL NOT delete any other keys on it. All job partitions must be stopped. Example key: connect:cp:jobName:partition:1:{*}",
+        "operationId": "deleteUsingDELETE",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/claim/{jobName}": {
+      "get": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "GET All Job Claim(s)",
+        "description": "Returns ALL job claims for the provided jobName including ALL job partitions. Example key: {connect}:job:jobName",
+        "operationId": "getJobClaimsUsingGET",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "DELETE All Job Claim(s)",
+        "description": "Deletes ALL job claims for the provided jobName including ALL job partitions. All job partitions must be stopped. The jobName will also be removed from {connect}:cluster:jobs:stopped. Example key: {connect}:job:jobName",
+        "operationId": "deleteUsingDELETE_1",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/config/{jobName}": {
+      "get": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "GET Job Configuration",
+        "description": "Returns job configuration for the provided jobName. Example key: {connect}:job:config:jobName",
+        "operationId": "getAllUsingGET",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "object"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT",
+          "QUICK START"
+        ],
+        "summary": "SAVE Job Configuration",
+        "description": "Saves job configuration for the provided jobName. Many of the optional job configuration attributes have default values which can be reviewed once the job configuration is saved or found in the documentation. Example key: {connect}:job:config:jobName",
+        "operationId": "saveUsingPOST_1",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "description": "file",
+                    "format": "binary",
+                    "exampleSetFlag": true,
+                    "types": [
+                      "string"
+                    ]
+                  }
+                },
+                "exampleSetFlag": true,
+                "types": [
+                  "object"
+                ]
+              },
+              "exampleSetFlag": false
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "DELETE Job Configuration",
+        "description": "Deletes job configuration for the provided jobName. This should be done with careful intent since job configuration is a dependency for many other administrative operations. Example key: {connect}:job:config:jobName",
+        "operationId": "deleteUsingDELETE_2",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/metrics/{jobName}": {
+      "delete": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "DELETE All Job Metrics",
+        "description": "Deletes ALL job metrics for the provided jobName including ALL job partitions. A job can be active during this operation. Example key: {connect}:job:config:jobName",
+        "operationId": "deleteJobMetricsUsingDELETE",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/transition/migrate/{jobId}": {
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "MIGRATE Job (Partition)",
+        "description": "Migrates a job, for the provided jobId, from its current cluster member to another with remaining job capacity. Keep in mind, for partitioned jobs, jobId represents only a single job partition. Partitioned jobs cannot have more than one partition migrated at the same time. For a migration to be initiated, there has to be at least one cluster member with remaining capacity. Once a migration begins, the cluster member that formerly claimed this jobId will be blacklisted so it cannot reclaim it. This blacklist designation will be removed once the job is claimed by another cluster member. This operation is typically performed for planned server outages as in the case of OS patching.",
+        "operationId": "migrateUsingPOST",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "description": "Example: {connect}:job:cdc-job:partition:2",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/transition/restart/{jobName}": {
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "RESTART Job",
+        "description": "Restarts a job including all job partitions. For a restart to be initiated, all job partitions must be active. There is no guarantee that a job partition will be claimed by the same cluster member that currently owns it. This operation is typically performed to facilitate configuration updates with only seconds of downtime.",
+        "operationId": "restartUsingPOST",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/transition/start/{jobName}/{jobType}": {
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT",
+          "QUICK START"
+        ],
+        "summary": "START Job",
+        "description": "Starts a job including all job partitions. This includes both initial load and stream jobs. For a job to be started, all job partitions must be stopped or never before been started. There is no guarantee on which cluster member will claim a job partition and there is no advantage to initiating this operation from a specific cluster member. Before a start is initiated, a job configuration must be created and a validation to confirm enough remaining capacity exists across the cluster for all job partitions (this does not apply to initial load). Both source and target databases will have their connections validated along with the file paths from which credentials are read. Once a job is started, partitioning will happen automatically based on the job configuration. If a previously stopped job is started, it will remove all previous job claims since its partition strategy might have been different.",
+        "operationId": "startUsingPOST",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          },
+          {
+            "name": "jobType",
+            "in": "path",
+            "description": "Options: { stream | load }",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/transition/stop/{jobName}": {
+      "post": {
+        "tags": [
+          "JOB MANAGEMENT",
+          "QUICK START"
+        ],
+        "summary": "STOP Job",
+        "description": "Stops a job including all job partitions. You cannot stop initial load jobs since they are removed automatically upon completion. For a job to be stopped, all job partitions must be active. Job claims, metrics, and checkpoints will all  be preserved upon a job stop, so it can resume from where it left off.",
+        "operationId": "stopUsingPOST",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/job/transition/validate/connections/{jobName}": {
+      "get": {
+        "tags": [
+          "JOB MANAGEMENT"
+        ],
+        "summary": "VALIDATE Source and Target Job Connections",
+        "description": "Validates both source and target connections based on the required fields in the job configuration and credentials files.",
+        "operationId": "validateSourceAndTargetUsingGET",
+        "parameters": [
+          {
+            "name": "jobName",
+            "in": "path",
+            "description": "Example: cdc-job",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/member/loglevel/{loggerName}": {
+      "get": {
+        "tags": [
+          "LOG MANAGEMENT"
+        ],
+        "summary": "GET Log Level",
+        "description": "Returns the log level for a provided logger on the cluster member from which this operation was initiated. Default value for loggerName is redis-connect. Check the logback.xml for all the loggers used by Redis Connect.",
+        "operationId": "listLogLevelUsingGET",
+        "parameters": [
+          {
+            "name": "loggerName",
+            "in": "path",
+            "description": "Example: redis-connect",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/connect/api/v1/cluster/member/loglevel/{loggerName}/{level}": {
+      "post": {
+        "tags": [
+          "LOG MANAGEMENT"
+        ],
+        "summary": "SAVE Log Level",
+        "description": "Saves log level for a provided logger on the cluster member from which this operation was initiated. Default value for loggerName is redis-connect. Check the logback.xml for all the loggers used by Redis Connect.",
+        "operationId": "updateLogLevelUsingPOST",
+        "parameters": [
+          {
+            "name": "loggerName",
+            "in": "path",
+            "description": "Example: redis-connect",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          },
+          {
+            "name": "level",
+            "in": "path",
+            "description": "Example: DEBUG",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "exampleSetFlag": true,
+              "types": [
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "exampleSetFlag": true,
+                  "types": [
+                    "string"
+                  ]
+                },
+                "exampleSetFlag": false
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components": {}
+}
