@@ -3,7 +3,7 @@ const ui = SwaggerUIBundle({
   urls: [
     {
       name: "job_manager",
-      url: "swagger.json",
+      url: "swagger.yaml",
     }
   ],
   dom_id: "#swagger-ui",
